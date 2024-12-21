@@ -1,1 +1,1 @@
-# React + Vite
+# pathfinder-visualizer
