@@ -1,0 +1,23 @@
+/**
+ * Contains all the styles for the customized circular node.
+*/
+:root {
+    --start-node-color: #8cca59;
+}
+
+/* Start node is colored green */
+div[data-id="1"] {
+    box-shadow: 0 0 11px 2px #5464dc;
+    background-color: var(--start-node-color);
+}
+
+/* Each node will be circular */
+.react-flow__node {
+    background-color: var(--start-node-color);
+    border-radius: 50%;
+    width: 100px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
