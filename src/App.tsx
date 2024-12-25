@@ -7,6 +7,12 @@ import {
 	useEdgesState,
 	addEdge,
 	ReactFlowProvider,
+    ConnectionLineType,
+    type Node,
+    type Edge,
+    type NodeTypes,
+    type OnConnect,
+    type Connection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -15,12 +21,13 @@ import CustomPanel from './components/Panel';
 
 import './App.css';
 
-let defaultMode = 'move';
+const defaultMode: string = 'move';
+const defaultNodeType: string = 'circularNode';
 
-const initialNodes = [
+const initialNodes: Node[] = [
 	{
 		id: '1',
-		type: 'circularNode',
+		type: defaultNodeType, 
 		data: {
 			label: '1',
 			mode: defaultMode, 
@@ -29,7 +36,7 @@ const initialNodes = [
 	},
 	{
 		id: 'test-node',
-		type: 'circularNode',
+		type: defaultNodeType,
 		data: {
 			label: 'Test Node',
 			mode: defaultMode,
@@ -38,15 +45,15 @@ const initialNodes = [
 	},
 ];
 
-const initialEdges = [];
+const initialEdges: Edge[] = [];
 
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
 	circularNode: CircularNode,
 };
 
 // id: 1 is reserved for the first node. So, we start from 2.
 let id = 2;
-const getId = () => `${id++}`;
+const getId = (): string => `${id++}`;
 
 function Flow() {
 	// This function is used to enable click and drag components.
@@ -58,24 +65,24 @@ function Flow() {
 	const [currentMode, setMode] = useState(defaultMode);
 
 	// This function is used to add an edge to two nodes.
-	const onConnect = useCallback((connection) => {
-		const newEdge = {
+	const onConnect: OnConnect = useCallback((connection: Connection) => {
+		const newEdge: Edge  = {
 			...connection,
 			id: `${connection.source}-${connection.target}`,
 			type: 'straight',
 		};
 		// oldEdges is a list of all the edges in the graph.
-		setEdges(oldEdges => {
+		setEdges((oldEdges) => {
 			return addEdge(newEdge, oldEdges)
 		});
 	}, [setEdges]);
 
-	const toggleModes = useCallback((newMode) => {
+	const toggleModes = useCallback((newMode: string) => {
 		setMode(newMode);
 
 		setNodes((currentNodes) => {
 			return currentNodes.map((node) => {
-				const modifiedNode = {
+				const modifiedNode: Node = {
 					...node,
 					data: {
 						...node.data,
@@ -94,7 +101,7 @@ function Flow() {
 			const newId = getId();
 			const newNode = {
 				id: newId,
-				type: 'circularNode',
+				type: defaultNodeType,
 				data: {
 					label: `${newId}`,
 					mode: currentMode,
@@ -113,13 +120,11 @@ function Flow() {
 			onNodesChange={onNodesChange}
 			onEdgesChange={onEdgesChange}
 			onConnect={onConnect}
-			connectionLineType={'straight'}
+			connectionLineType={ConnectionLineType.Straight}
 			nodeTypes={nodeTypes}
 			fitView
 		>
-			<CustomPanel position="top-left" createNode={createNode}
-			toggleModes={toggleModes}
-			/>
+			<CustomPanel position="top-left"createNode={createNode}	toggleModes={toggleModes} />
 			<Background />
 			<Controls />
 		</ReactFlow>

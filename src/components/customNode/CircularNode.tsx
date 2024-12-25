@@ -1,14 +1,21 @@
-import { Handle, Position, useConnection } from '@xyflow/react';
-import PropTypes from 'prop-types';
+import {
+    Handle,
+    Position,
+    useConnection,
+    Node,
+    NodeProps,
+} from '@xyflow/react';
 
 import './CircularNode.css';
 
-/**
- * 
- * @param {*} param0 
- * @returns 
- */
-function CircularNode({ id, data }) {
+type CircularNodeData = {
+    label: string,
+    mode: string,
+};
+type CircularNode = Node<CircularNodeData, 'circularNode'>;
+
+// id is already defined in NodeProps
+function CircularNode({ id, data }: NodeProps<CircularNode>) {
 	const connection = useConnection();
 
 	const isTarget = connection.inProgress && connection.fromNode.id !== id;
@@ -36,13 +43,5 @@ function CircularNode({ id, data }) {
 		</div>
 	);
 }
-
-CircularNode.propTypes = {
-	id: PropTypes.string.isRequired,
-	data: PropTypes.shape({
-		label: PropTypes.string.isRequired,
-		mode: PropTypes.string.isRequired,
-	}).isRequired,
-};
 
 export default CircularNode;

@@ -1,10 +1,17 @@
 import {
     Panel,
+    type PanelPosition,
 } from '@xyflow/react';
-import PropTypes from 'prop-types';
 
+// PanelProps is supposed to have chlidren. So this custom type is not an extension of PanelProps.
+// This is just a wrapper.
+type CustomPanelProps = {
+    position: PanelPosition,
+    createNode: () => void,
+    toggleModes: (newMode: string) => void,
+};
 
-function CustomPanel({ position, createNode, toggleModes }) {
+function CustomPanel({ position, createNode, toggleModes }: CustomPanelProps) {
     return (
         <Panel className="custom-panel" position={position}>
             <div id="toolbar">
@@ -21,11 +28,5 @@ function CustomPanel({ position, createNode, toggleModes }) {
         </Panel>
     );
 }
-
-CustomPanel.propTypes = {
-    position: PropTypes.string.isRequired,
-    createNode: PropTypes.func.isRequired,
-    toggleModes: PropTypes.func.isRequired,
-};
 
 export default CustomPanel;
