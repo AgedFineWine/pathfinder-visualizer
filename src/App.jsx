@@ -15,6 +15,7 @@ import CustomPanel from './components/Panel';
 
 import './App.css';
 
+let defaultMode = 'move';
 
 const initialNodes = [
 	{
@@ -22,7 +23,7 @@ const initialNodes = [
 		type: 'circularNode',
 		data: {
 			label: '1',
-			mode: 'connect'
+			mode: defaultMode, 
 		},
 		position: { x: 250, y: 25 },
 	},
@@ -31,7 +32,7 @@ const initialNodes = [
 		type: 'circularNode',
 		data: {
 			label: 'Test Node',
-			mode: 'connect',
+			mode: defaultMode,
 		},
 		position: { x: 400, y: 180 },
 	},
@@ -54,19 +55,40 @@ function Flow() {
 	// onEdgesChange is used to remove an edge from two nodes.
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-	const [mode, setMode] = useState('connect');
+	const [currentMode, setMode] = useState(defaultMode);
 
 	// This function is used to add an edge to two nodes.
 	const onConnect = useCallback((connection) => {
 		const newEdge = {
 			...connection,
 			id: `${connection.source}-${connection.target}`,
-			// type: 'straight',
+			type: 'straight',
 		};
-		// Edges is a list of all the edges in the graph.
-		setEdges(oldEdges => addEdge(newEdge, oldEdges));
+		// oldEdges is a list of all the edges in the graph.
+		setEdges(oldEdges => {
+			return addEdge(newEdge, oldEdges)
+		});
 	}, [setEdges]);
 
+	const toggleModes = useCallback((newMode) => {
+		setMode(newMode);
+
+		setNodes((currentNodes) => {
+			return currentNodes.map((node) => {
+				const modifiedNode = {
+					...node,
+					data: {
+						...node.data,
+						mode: newMode,
+					}
+				};
+				return modifiedNode;
+			});
+		});
+
+	}, [setNodes]);
+
+	// Changes to the nodes must be correspondingly made here.
 	const createNode = useCallback(() => {
 		setNodes((currentNodes) => {
 			const newId = getId();
@@ -74,33 +96,14 @@ function Flow() {
 				id: newId,
 				type: 'circularNode',
 				data: {
-					label: `${newId}`
+					label: `${newId}`,
+					mode: currentMode,
 				},
 				position: { x: 400, y: 25 },
 			};
 			return [...currentNodes, newNode];
 		});
-	}, [setNodes]);
-
-
-	const toggleModes = useCallback((newMode) => {
-		setMode(() => {
-			// *NOTE*: setNodes is used to update the list of nodes on the screen.
-			setNodes((currentNodes) =>
-				currentNodes.map((node) => {
-					const newNode = {
-						...node,
-						data: {
-							...node.data,
-							mode: newMode,
-						}
-					};
-					return newNode;
-				}
-			));
-			return newMode;
-		});
-	}, [setNodes]);
+	}, [currentMode, setNodes] );
 
 	return (
 		<ReactFlow
@@ -114,7 +117,9 @@ function Flow() {
 			nodeTypes={nodeTypes}
 			fitView
 		>
-			<CustomPanel position="top-left" createNode={createNode} toggleModes={toggleModes} />
+			<CustomPanel position="top-left" createNode={createNode}
+			toggleModes={toggleModes}
+			/>
 			<Background />
 			<Controls />
 		</ReactFlow>
