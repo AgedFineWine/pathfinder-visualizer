@@ -35,21 +35,21 @@ div[data-id="1"] {
 /* NOTE: Must move the handle to the middle of the node regardless whether it is a source or target handle. */
 .custom-handle {
     position: absolute;
+    border: none;
+    transform: none;
     top: 50%;
     left: 50%;
-    /* Must use translate instead of transform since transform is being overwritten depending on the mode. */
     translate: -50% -50%;
-    border: none;
-    width: 100%;
-    height: 100%;
     opacity: 0;
 }
 
 .connect {
-    transform: none;
+    width: 100%;
+    height: 100%;
 }
 
 .move {
-    display: none;
+    pointer-events: none;
 }
+
 /* ========================== END of section for the handles ========================== */
