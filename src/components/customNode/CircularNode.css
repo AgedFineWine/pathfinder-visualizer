@@ -5,13 +5,12 @@
     --start-node-color: #8cca59;
 }
 
-/* Start node is colored green */
+/* Start node might have a special color??? Not sure yet. */
 div[data-id="1"] {
     box-shadow: 0 0 11px 2px #5464dc;
     background-color: var(--start-node-color);
 }
 
-/* Each node will be circular */
 .react-flow__node {
     background-color: var(--start-node-color);
     border-radius: 50%;
@@ -21,3 +20,36 @@ div[data-id="1"] {
     align-items: center;
     justify-content: center;
 }
+
+.custom-node-body {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* ========================== START of section for the handles ========================== */
+/* NOTE: Must move the handle to the middle of the node regardless whether it is a source or target handle. */
+.custom-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Must use translate instead of transform since transform is being overwritten depending on the mode. */
+    translate: -50% -50%;
+    border: none;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+.connect {
+    transform: none;
+}
+
+.move {
+    display: none;
+}
+/* ========================== END of section for the handles ========================== */
