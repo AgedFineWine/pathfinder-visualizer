@@ -1,112 +1,191 @@
 import { Position, MarkerType, InternalNode } from '@xyflow/react';
 
-const defaultValue: number = 0;
+interface IntersectionCalculation {
+	base: number,
+	height: number,
+	radius: number,
+	centerInterX: number,
+	centerInterY: number,
+	centerTargetX: number,
+	centerTargetY: number
+};
 
-// this helper function returns the intersection point
-// of the line between the center of the intersectionNode and the target node
+function scenarioA({ base, height, radius, centerInterX, centerInterY, centerTargetX, centerTargetY }: IntersectionCalculation, rightIntersection: boolean) {
+	// We assume the point is on the left side (intersection point) of the target node.
+	let angleInRadians = Math.atan(base / height);
+
+	// If assumption is false we overwrite by finding the complementary angle.
+	let x;
+	let y;
+
+	if (rightIntersection) {
+		// If assumption is false we overwrite by finding the complementary angle.
+		angleInRadians = (Math.PI / 2) - angleInRadians;
+		const dx = radius * Math.cos(angleInRadians);
+		const dy = radius * Math.sin(angleInRadians);
+		x = centerTargetX - dx;
+		y = centerTargetY - dy;
+	} else {
+		// For left intersection.
+		const dx = radius * Math.sin(angleInRadians);
+		const dy = radius * Math.cos(angleInRadians);
+		x = centerInterX + dx;
+		y = centerInterY + dy;
+	}
+	return { x, y };
+}
+
+function scenarioB ({ base, height, radius, centerInterX, centerInterY, centerTargetX, centerTargetY }: IntersectionCalculation , rightIntersection: boolean) {
+	let angleInRadians = Math.atan(height / base);
+	let x;
+	let y;
+
+	if (rightIntersection) {
+		angleInRadians = (Math.PI / 2) - angleInRadians;
+		const dx = radius * Math.sin(angleInRadians);
+		const dy = radius * Math.cos(angleInRadians);
+		x = centerTargetX - dx;
+		y = centerTargetY - dy;
+
+		if (centerInterX > centerTargetX) {
+			x = centerTargetX + dx;
+			y = centerTargetY + dy;
+		}
+	} else {
+		// for left intersection.
+		const dx = radius * Math.cos(angleInRadians);
+		const dy = radius * Math.sin(angleInRadians);
+		x = centerInterX + dx;
+		y = centerInterY + dy;	
+
+		if (centerInterX > centerTargetX) {
+			x = centerInterX - dx;
+			y = centerInterY - dy;
+		}
+	}
+	return { x, y };
+}
+
 function getNodeIntersection(intersectionNode: InternalNode, targetNode: InternalNode) {
-  // https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
-  const { width: intersectionNodeWidth, height: intersectionNodeHeight } =
-    intersectionNode.measured;
-  const intersectionNodePosition = intersectionNode.internals.positionAbsolute;
-  const targetPosition = targetNode.internals.positionAbsolute;
+	const { width: intersectionNodeWidth } = intersectionNode.measured;
+	const intersectionNodePosition = intersectionNode.internals.positionAbsolute;
+	const targetPosition = targetNode.internals.positionAbsolute;
 
-  console.log(`Intersection node width: ${intersectionNodeWidth}`);
-  console.log(`Intersection node height: ${intersectionNodeHeight}`);
-  console.log(`Intersection node position: (${intersectionNodePosition.x}, ${intersectionNodePosition.y})`);
-  console.log(`Target node position: (${targetPosition.x}, ${targetPosition.y})`);
+	const defaultRadius: number = 0;
+	const radius = (intersectionNodeWidth ?? defaultRadius) / 2;
+	const centerInterX = intersectionNodePosition.x + radius;
+	const centerInterY = intersectionNodePosition.y + radius;
+	const centerTargetX = targetPosition.x + radius;
+	const centerTargetY = targetPosition.y + radius;
 
-  const w = ( intersectionNodeWidth ?? defaultValue ) / 2;
-  const h = ( intersectionNodeHeight ?? defaultValue ) / 2;
+	const base = centerTargetX - centerInterX;
+	const height = centerTargetY - centerInterY;
 
-  const x2 = intersectionNodePosition.x + w;
-  const y2 = intersectionNodePosition.y + h;
-  const x1 = targetPosition.x + ( targetNode.measured.width ?? 0 ) / 2;
-  const y1 = targetPosition.y + ( targetNode.measured.height ?? 0 )/ 2;
+	const intersectionCalculation: IntersectionCalculation = {
+		base,
+		height,
+		radius,
+		centerInterX,
+		centerInterY,
+		centerTargetX,
+		centerTargetY
+	};
 
-  const xx1 = (x1 - x2) / (2 * w) - (y1 - y2) / (2 * h);
-  const yy1 = (x1 - x2) / (2 * w) + (y1 - y2) / (2 * h);
-  const a = 1 / (Math.abs(xx1) + Math.abs(yy1) || 1);
-  const xx3 = a * xx1;
-  const yy3 = a * yy1;
-  const x = w * (xx3 + yy3) + x2;
-  const y = h * (-xx3 + yy3) + y2;
+	return intersectionCalculation;
+}
 
-  return { x, y };
+function decideScenario(intersectionCalculation: IntersectionCalculation) {
+	if (intersectionCalculation.centerInterY < intersectionCalculation.centerTargetY ) {
+		return {
+			sourceIntersectionPoint: scenarioA(intersectionCalculation, false),
+			targetIntersectionPoint: scenarioA(intersectionCalculation, true)
+		};
+	}
+
+	return {
+		sourceIntersectionPoint: scenarioB(intersectionCalculation, false),
+		targetIntersectionPoint: scenarioB(intersectionCalculation, true)
+	};
 }
 
 interface IntersectionPoint {
-  x: number;
-  y: number;
+	x: number,
+	y: number,
 };
 
 // returns the position (top,right,bottom or right) passed node compared to the intersection point
 function getEdgePosition(node: InternalNode, intersectionPoint: IntersectionPoint) {
-  const n = { ...node.measured.positionAbsolute, ...node };
-  const nx = Math.round(n.x);
-  const ny = Math.round(n.y);
-  const px = Math.round(intersectionPoint.x);
-  const py = Math.round(intersectionPoint.y);
+	const n = { ...node.internals.positionAbsolute, ...node };
+	const nx = Math.round(n.x);
+	const ny = Math.round(n.y);
+	const px = Math.round(intersectionPoint.x);
+	const py = Math.round(intersectionPoint.y);
 
-  if (px <= nx + 1) {
-    return Position.Left;
-  }
-  if (px >= nx + n.measured.width - 1) {
-    return Position.Right;
-  }
-  if (py <= ny + 1) {
-    return Position.Top;
-  }
-  if (py >= n.y + n.measured.height - 1) {
-    return Position.Bottom;
-  }
+	if (px <= nx + 1) {
+		return Position.Left;
+	}
+	if (px >= nx + n.measured.width - 1) {
+		return Position.Right;
+	}
+	if (py <= ny + 1) {
+		return Position.Top;
+	}
+	if (py >= n.y + n.measured.height - 1) {
+		return Position.Bottom;
+	}
 
-  return Position.Top;
+	return Position.Top;
 }
 
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
 export function getEdgeParams(source: InternalNode, target: InternalNode) {
-  const sourceIntersectionPoint = getNodeIntersection(source, target);
-  const targetIntersectionPoint = getNodeIntersection(target, source);
+	// Calculate the left intersection first. Diagram:
+	// P: intersection point
+	// (intersection node)P ----- > (target node)tersection first.
 
-  const sourcePos = getEdgePosition(source, sourceIntersectionPoint);
-  const targetPos = getEdgePosition(target, targetIntersectionPoint);
+	const intersectionCalculation = getNodeIntersection(source, target);
+	const { sourceIntersectionPoint, targetIntersectionPoint } = decideScenario(intersectionCalculation);
 
-  return {
-    sx: sourceIntersectionPoint.x,
-    sy: sourceIntersectionPoint.y,
-    tx: targetIntersectionPoint.x,
-    ty: targetIntersectionPoint.y,
-    sourcePos,
-    targetPos,
-  };
+	const sourcePos = getEdgePosition(source, sourceIntersectionPoint);
+	const targetPos = getEdgePosition(target, targetIntersectionPoint);
+	console.log(`sourceInter: ${sourceIntersectionPoint.x}, ${sourceIntersectionPoint.y}`);
+	console.log(`targerInter: ${targetIntersectionPoint.x}, ${targetIntersectionPoint.y}`);
+
+	return {
+		sx: sourceIntersectionPoint.x,
+		sy: sourceIntersectionPoint.y,
+		tx: targetIntersectionPoint.x,
+		ty: targetIntersectionPoint.y,
+		sourcePos,
+		targetPos,
+	};
 }
 
 export function createNodesAndEdges() {
-  const nodes = [];
-  const edges = [];
-  const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+	const nodes = [];
+	const edges = [];
+	const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-  nodes.push({ id: 'target', data: { label: 'Target' }, position: center });
+	nodes.push({ id: 'target', data: { label: 'Target' }, position: center });
 
-  for (let i = 0; i < 8; i++) {
-    const degrees = i * (360 / 8);
-    const radians = degrees * (Math.PI / 180);
-    const x = 250 * Math.cos(radians) + center.x;
-    const y = 250 * Math.sin(radians) + center.y;
+	for (let i = 0; i < 8; i++) {
+		const degrees = i * (360 / 8);
+		const radians = degrees * (Math.PI / 180);
+		const x = 250 * Math.cos(radians) + center.x;
+		const y = 250 * Math.sin(radians) + center.y;
 
-    nodes.push({ id: `${i}`, data: { label: 'Source' }, position: { x, y } });
+		nodes.push({ id: `${i}`, data: { label: 'Source' }, position: { x, y } });
 
-    edges.push({
-      id: `edge-${i}`,
-      target: 'target',
-      source: `${i}`,
-      type: 'floating',
-      markerEnd: {
-        type: MarkerType.Arrow,
-      },
-    });
-  }
+		edges.push({
+			id: `edge-${i}`,
+			target: 'target',
+			source: `${i}`,
+			type: 'floating',
+			markerEnd: {
+				type: MarkerType.Arrow,
+			},
+		});
+	}
 
-  return { nodes, edges };
+	return { nodes, edges };
 }

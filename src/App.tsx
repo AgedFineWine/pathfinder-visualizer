@@ -8,6 +8,8 @@ import {
 	addEdge,
 	ReactFlowProvider,
     ConnectionLineType,
+    MarkerType,
+    DefaultEdgeOptions,
     type Node,
     type Edge,
     type NodeTypes,
@@ -16,8 +18,9 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import CircularNode from './components/customNode/CircularNode';
-import CustomPanel from './components/Panel';
+import CircularNode from './components/customNode/CircularNode.tsx';
+import CustomPanel from './components/Panel/Panel.tsx';
+import ArrowEdge from './components/ArrowEdge.tsx';
 
 import './App.css';
 
@@ -32,7 +35,7 @@ const initialNodes: Node[] = [
 			label: '1',
 			mode: defaultMode, 
 		},
-		position: { x: 250, y: 25 },
+		position: { x: 0, y: 0 },
 	},
 	{
 		id: 'test-node',
@@ -41,7 +44,7 @@ const initialNodes: Node[] = [
 			label: 'Test Node',
 			mode: defaultMode,
 		},
-		position: { x: 400, y: 180 },
+		position: { x: 150, y: 150 },
 	},
 ];
 
@@ -49,6 +52,17 @@ const initialEdges: Edge[] = [];
 
 const nodeTypes: NodeTypes = {
 	circularNode: CircularNode,
+};
+
+const edgeTypes = {
+    arrowEdge: ArrowEdge,
+};
+
+const defaultEdgeOptions: DefaultEdgeOptions = {
+    type: 'arrowEdge',
+    markerEnd: {
+        type: MarkerType.ArrowClosed,
+    }
 };
 
 // id: 1 is reserved for the first node. So, we start from 2.
@@ -69,7 +83,7 @@ function Flow() {
 		const newEdge: Edge  = {
 			...connection,
 			id: `${connection.source}-${connection.target}`,
-			type: 'straight',
+			type: 'arrowEdge',
 		};
 		// oldEdges is a list of all the edges in the graph.
 		setEdges((oldEdges) => {
@@ -122,6 +136,8 @@ function Flow() {
 			onConnect={onConnect}
 			connectionLineType={ConnectionLineType.Straight}
 			nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            defaultEdgeOptions={defaultEdgeOptions}
 			fitView
 		>
 			<CustomPanel position="top-left"createNode={createNode}	toggleModes={toggleModes} />
