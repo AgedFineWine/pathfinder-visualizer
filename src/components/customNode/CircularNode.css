@@ -43,13 +43,14 @@ div[data-id="1"] {
     opacity: 0;
 }
 
+/* technically not needed. just move width and height to custom-handle */
 .connect {
     width: 100%;
     height: 100%;
 }
 
-.move {
-    pointer-events: none;
+div.move {
+    visibility: hidden;
 }
 
 /* ========================== END of section for the handles ========================== */
