@@ -37,15 +37,15 @@ const initialNodes: Node[] = [
 		},
 		position: { x: 0, y: 0 },
 	},
-	{
-		id: 'test-node',
-		type: defaultNodeType,
-		data: {
-			label: 'Test Node',
-			mode: defaultMode,
-		},
-		position: { x: 150, y: 150 },
-	},
+	// {
+	// 	id: 'test-node',
+	// 	type: defaultNodeType,
+	// 	data: {
+	// 		label: 'Test Node',
+	// 		mode: defaultMode,
+	// 	},
+	// 	position: { x: 150, y: 150 },
+	// },
 ];
 
 const initialEdges: Edge[] = [];
@@ -62,12 +62,13 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
     type: 'arrowEdge',
     markerEnd: {
         type: MarkerType.ArrowClosed,
-    }
+    },
+	style: {
+		strokeWidth: 3,
+	}
 };
 
 // id: 1 is reserved for the first node. So, we start from 2.
-let id = 2;
-const getId = (): string => `${id++}`;
 
 function Flow() {
 	// This function is used to enable click and drag components.
@@ -78,12 +79,34 @@ function Flow() {
 
 	const [currentMode, setMode] = useState(defaultMode);
 
+	const [id, setId] = useState(1);
+
+	/**
+	 * getId() generates a new ID that is guaranteed that it is not already in use.
+	 */
+	const getId = useCallback(() => {
+		let newId: number = id;
+		setId((currentId) => {
+			newId = currentId;
+			for (let i = 1; i < nodes.length + 2; i++) {
+				if (nodes.some((node) => node.id === `${i}`)) {
+					continue;
+				} else {
+					newId = i;
+					break;
+				}
+			}
+			return newId;
+		});
+
+		return `${newId}`;
+	}, [nodes, id]);
+
 	// This function is used to add an edge to two nodes.
 	const onConnect: OnConnect = useCallback((connection: Connection) => {
 		const newEdge: Edge  = {
 			...connection,
 			id: `${connection.source}-${connection.target}`,
-			type: 'arrowEdge',
 		};
 		// oldEdges is a list of all the edges in the graph.
 		setEdges((oldEdges) => {
@@ -124,7 +147,7 @@ function Flow() {
 			};
 			return [...currentNodes, newNode];
 		});
-	}, [currentMode, setNodes] );
+	}, [currentMode, setNodes, getId] );
 
 	return (
 		<ReactFlow
@@ -135,6 +158,7 @@ function Flow() {
 			onEdgesChange={onEdgesChange}
 			onConnect={onConnect}
 			connectionLineType={ConnectionLineType.Straight}
+			connectionLineStyle={{ strokeWidth: 3}}
 			nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             defaultEdgeOptions={defaultEdgeOptions}
