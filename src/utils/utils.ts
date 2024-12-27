@@ -10,27 +10,30 @@ interface IntersectionCalculation {
 	centerTargetY: number
 };
 
+// Padding represents the scalar value to increase the distance between the intersection point and the node. 
+// Scalar value is multiplied by the change in distance dx or dy.
+// dx represents the change in x-coordinate of the intersection point from the center of the node.
+// dy represents the change in y-coordinate of the intersection point from the center of the node.
+const padding: number = 0.3;
+
 function scenarioA({ base, height, radius, centerInterX, centerInterY, centerTargetX, centerTargetY }: IntersectionCalculation, rightIntersection: boolean) {
 	// We assume the point is on the left side (intersection point) of the target node.
 	let angleInRadians = Math.atan(base / height);
-
-	// If assumption is false we overwrite by finding the complementary angle.
 	let x;
 	let y;
 
 	if (rightIntersection) {
-		// If assumption is false we overwrite by finding the complementary angle.
 		angleInRadians = (Math.PI / 2) - angleInRadians;
 		const dx = radius * Math.cos(angleInRadians);
 		const dy = radius * Math.sin(angleInRadians);
-		x = centerTargetX - dx;
-		y = centerTargetY - dy;
+		x = centerTargetX - dx - (padding * dx);
+		y = centerTargetY - dy - (padding * dy);
 	} else {
 		// For left intersection.
 		const dx = radius * Math.sin(angleInRadians);
 		const dy = radius * Math.cos(angleInRadians);
-		x = centerInterX + dx;
-		y = centerInterY + dy;
+		x = centerInterX + dx + (padding * dx);
+		y = centerInterY + dy + (padding * dy);
 	}
 	return { x, y };
 }
@@ -44,29 +47,29 @@ function scenarioB ({ base, height, radius, centerInterX, centerInterY, centerTa
 		angleInRadians = (Math.PI / 2) - angleInRadians;
 		const dx = radius * Math.sin(angleInRadians);
 		const dy = radius * Math.cos(angleInRadians);
-		x = centerTargetX - dx;
-		y = centerTargetY - dy;
+		x = centerTargetX - dx - (padding * dx);
+		y = centerTargetY - dy - (padding * dy);
 
 		if (centerInterX > centerTargetX) {
-			x = centerTargetX + dx;
-			y = centerTargetY + dy;
+			x = centerTargetX + dx + (padding * dx);
+			y = centerTargetY + dy + (padding * dy);
 		}
 	} else {
 		// for left intersection.
 		const dx = radius * Math.cos(angleInRadians);
 		const dy = radius * Math.sin(angleInRadians);
-		x = centerInterX + dx;
-		y = centerInterY + dy;	
+		x = centerInterX + dx + (padding * dx);
+		y = centerInterY + dy + (padding * dy);	
 
 		if (centerInterX > centerTargetX) {
-			x = centerInterX - dx;
-			y = centerInterY - dy;
+			x = centerInterX - dx - (padding * dx);
+			y = centerInterY - dy - (padding * dy);
 		}
 	}
 	return { x, y };
 }
 
-function getNodeIntersection(intersectionNode: InternalNode, targetNode: InternalNode) {
+function getIntersectionInfo(intersectionNode: InternalNode, targetNode: InternalNode) {
 	const { width: intersectionNodeWidth } = intersectionNode.measured;
 	const intersectionNodePosition = intersectionNode.internals.positionAbsolute;
 	const targetPosition = targetNode.internals.positionAbsolute;
@@ -124,13 +127,13 @@ function getEdgePosition(node: InternalNode, intersectionPoint: IntersectionPoin
 	if (px <= nx + 1) {
 		return Position.Left;
 	}
-	if (px >= nx + n.measured.width - 1) {
+	if (px >= nx + n.measured.width! - 1) {
 		return Position.Right;
 	}
 	if (py <= ny + 1) {
 		return Position.Top;
 	}
-	if (py >= n.y + n.measured.height - 1) {
+	if (py >= n.y + n.measured.height! - 1) {
 		return Position.Bottom;
 	}
 
@@ -139,17 +142,11 @@ function getEdgePosition(node: InternalNode, intersectionPoint: IntersectionPoin
 
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
 export function getEdgeParams(source: InternalNode, target: InternalNode) {
-	// Calculate the left intersection first. Diagram:
-	// P: intersection point
-	// (intersection node)P ----- > (target node)tersection first.
-
-	const intersectionCalculation = getNodeIntersection(source, target);
+	const intersectionCalculation = getIntersectionInfo(source, target);
 	const { sourceIntersectionPoint, targetIntersectionPoint } = decideScenario(intersectionCalculation);
 
 	const sourcePos = getEdgePosition(source, sourceIntersectionPoint);
 	const targetPos = getEdgePosition(target, targetIntersectionPoint);
-	console.log(`sourceInter: ${sourceIntersectionPoint.x}, ${sourceIntersectionPoint.y}`);
-	console.log(`targerInter: ${targetIntersectionPoint.x}, ${targetIntersectionPoint.y}`);
 
 	return {
 		sx: sourceIntersectionPoint.x,
