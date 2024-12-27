@@ -27,6 +27,7 @@ function ArrowEdge({ id, source, target, markerEnd, style }: EdgeProps) {
             className="react-flow__edge-path"
             d={edgePath}
             markerEnd={markerEnd}
+            style={style}
         />
     );
 }
