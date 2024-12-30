@@ -3,20 +3,25 @@ import {
 	ReactFlow,
 	Background,
 	Controls,
-	useNodesState,
-	useEdgesState,
+	applyEdgeChanges,
+	applyNodeChanges,
 	addEdge,
 	ReactFlowProvider,
-    ConnectionLineType,
-    MarkerType,
-    DefaultEdgeOptions,
-    type Node,
-    type Edge,
-    type NodeTypes,
-    type OnConnect,
-    type Connection,
+	ConnectionLineType,
+	MarkerType,
+	DefaultEdgeOptions,
+	useReactFlow,
+	NodeChange,
+	EdgeChange,
+	type Node,
+	type Edge,
+	type NodeTypes,
+	type OnConnect,
+	type Connection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+
+import { Mode, Terminal } from './utils/enums.ts';
 
 import CircularNode from './components/customNode/CircularNode.tsx';
 import LeftPanel from './components/leftPanel/leftPanel.tsx';
@@ -24,28 +29,21 @@ import ArrowEdge from './components/ArrowEdge.tsx';
 
 import './App.css';
 
-const defaultMode: string = 'move';
+const defaultMode = Mode.Move;
 const defaultNodeType: string = 'circularNode';
+const radius: number = 50;
 
 const initialNodes: Node[] = [
 	{
 		id: '1',
-		type: defaultNodeType, 
+		type: defaultNodeType,
 		data: {
 			label: '1',
-			mode: defaultMode, 
+			mode: defaultMode,
+			terminal: Terminal.Start,
 		},
 		position: { x: 0, y: 0 },
 	},
-	// {
-	// 	id: 'test-node',
-	// 	type: defaultNodeType,
-	// 	data: {
-	// 		label: 'Test Node',
-	// 		mode: defaultMode,
-	// 	},
-	// 	position: { x: 150, y: 150 },
-	// },
 ];
 
 const initialEdges: Edge[] = [];
@@ -55,27 +53,39 @@ const nodeTypes: NodeTypes = {
 };
 
 const edgeTypes = {
-    arrowEdge: ArrowEdge,
+	arrowEdge: ArrowEdge,
 };
 
 const defaultEdgeOptions: DefaultEdgeOptions = {
-    type: 'arrowEdge',
-    markerEnd: {
-        type: MarkerType.ArrowClosed,
-    },
+	type: 'arrowEdge',
+	markerEnd: {
+		type: MarkerType.ArrowClosed,
+	},
 	style: {
 		strokeWidth: 3,
 	}
 };
 
 function Flow() {
-	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+	const [currentMode, setMode] = useState<Mode>(defaultMode);
 
-	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+	const [nodes, setNodes] = useState(initialNodes);
 
-	const [currentMode, setMode] = useState(defaultMode);
+	const onNodesChange = useCallback((changes: NodeChange<Node>[]) => {
+		if (currentMode === Mode.StartSelect || currentMode === Mode.DestinationSelect) return;
+		setNodes((oldNodes) => applyNodeChanges(changes, oldNodes));
+	}, [setNodes, currentMode]);
 
+	const [edges, setEdges] = useState(initialEdges);
+
+	const onEdgesChange = useCallback((changes: EdgeChange<Edge>[]) => {
+		if (currentMode === Mode.StartSelect || currentMode === Mode.DestinationSelect) return;
+		setEdges((oldEdges) => applyEdgeChanges(changes, oldEdges));
+	}, [setEdges, currentMode]);
+	
 	const [id, setId] = useState(1);
+
+	const reactFlowInstance = useReactFlow();
 
 	/**
 	 * getId() generates a new ID that is guaranteed that it is not already in use.
@@ -100,7 +110,7 @@ function Flow() {
 
 	// This function is used to add an edge to two nodes.
 	const onConnect: OnConnect = useCallback((connection: Connection) => {
-		const newEdge: Edge  = {
+		const newEdge: Edge = {
 			...connection,
 			id: `${connection.source}-${connection.target}`,
 		};
@@ -110,7 +120,7 @@ function Flow() {
 		});
 	}, [setEdges]);
 
-	const toggleModes = useCallback((newMode: string) => {
+	const toggleModes = useCallback((newMode: Mode) => {
 		setMode(newMode);
 
 		setNodes((currentNodes) => {
@@ -129,7 +139,8 @@ function Flow() {
 	}, [setNodes]);
 
 	// Changes to the nodes must be correspondingly made here.
-	const createNode = useCallback(() => {
+	const createNode = useCallback((event: React.MouseEvent) => {
+		const { x, y } = reactFlowInstance.screenToFlowPosition({ x: event.clientX, y: event.clientY });
 		setNodes((currentNodes) => {
 			const newId = getId();
 			const newNode = {
@@ -138,29 +149,78 @@ function Flow() {
 				data: {
 					label: `${newId}`,
 					mode: currentMode,
+					terminal: null,
 				},
-				position: { x: 400, y: 25 },
+				position: { x: x - radius, y: y - radius },
 			};
 			return [...currentNodes, newNode];
 		});
-	}, [currentMode, setNodes, getId] );
+	}, [currentMode, setNodes, getId, reactFlowInstance]);
+
+	const selectNode = useCallback((event: React.MouseEvent, node: Node) => {
+		const terminal = currentMode === Mode.StartSelect ? Terminal.Start :
+			(currentMode === Mode.DestinationSelect ? Terminal.Destination
+				: null);
+
+		if (!terminal) return;
+
+		setNodes((currentNodes) => {
+			return currentNodes.map((n) => {
+				if (n.data.terminal === terminal) {
+					return {
+						...n,
+						data: {
+							...n.data,
+							terminal: null,
+						}
+					};
+				}
+
+				if (n.id === node.id) {
+					return {
+						...n,
+						data: {
+							...n.data,
+							terminal: terminal,
+						}
+					};
+				}
+
+				return n;
+			});
+		});
+
+	}, [currentMode, setNodes]);
+
+	const handleClick = useCallback((event: React.MouseEvent) => {
+		if (currentMode !== Mode.Add) return;
+
+		const panel = ((document.getElementsByClassName('react-flow__panel'))[0]);
+		const clickedElement = event.target as HTMLElement;
+		if (panel.contains(clickedElement)) return;
+
+		if (currentMode === Mode.Add) createNode(event);
+
+	}, [currentMode, createNode]);
+
 
 	return (
 		<ReactFlow
-			// colorMode='dark'
 			nodes={nodes}
 			edges={edges}
 			onNodesChange={onNodesChange}
 			onEdgesChange={onEdgesChange}
 			onConnect={onConnect}
 			connectionLineType={ConnectionLineType.Straight}
-			connectionLineStyle={{ strokeWidth: 3}}
+			connectionLineStyle={{ strokeWidth: 3 }}
 			nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            defaultEdgeOptions={defaultEdgeOptions}
+			edgeTypes={edgeTypes}
+			defaultEdgeOptions={defaultEdgeOptions}
+			onClick={handleClick}
+			onNodeClick={selectNode}
 			fitView
 		>
-			<LeftPanel position="top-left" createNode={createNode} toggleModes={toggleModes} defaultMode={defaultMode}/>
+			<LeftPanel position="top-left" toggleModes={toggleModes} defaultMode={defaultMode} />
 			<Background />
 			<Controls />
 		</ReactFlow>
