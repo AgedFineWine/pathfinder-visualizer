@@ -13,7 +13,7 @@ span {
 
 .left-tool-bar {
     box-sizing: border-box;
-    width: 188px;
+    width: 195px;
     background-color: #fff;
     box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.241);
     border-radius: var(--all-border-radius);
@@ -31,8 +31,8 @@ span {
     cursor: pointer;
     font-size: 1rem;
     border-radius: var(--all-border-radius);
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
 }
 
 .weight-btn {
@@ -52,13 +52,18 @@ span {
     column-gap: 6%;
 }
 
-.left-tool-bar button:hover {
+.left-tool-bar .svg-btn:hover, .left-tool-bar .preload-btn:hover {
     transform: scale(1.07);
     background-color: #f6f4ff;
     transition: transform .3s;
 }
 
-button.active-color {
+.submit-btn:hover {
+    transform: scale(1.07);
+    transition: transform .3s;
+}
+
+button.active-color{
     background-color: var(--active-btn-color);
 }
 
@@ -70,6 +75,7 @@ button.active-color {
     border: none;
     border-radius: var(--all-border-radius);
     padding: .4rem 1.2rem;
+    background-color: none;
 }
 
 .algorithm-selection {
@@ -79,6 +85,8 @@ button.active-color {
     padding: .5rem .3rem;
     background-color: var(--btn-background-color);
     border-radius: var(--all-border-radius);
+    font-size: 1rem;
+    cursor: pointer;
 }
 
 option {
