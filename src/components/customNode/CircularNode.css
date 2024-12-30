@@ -6,9 +6,12 @@
 }
 
 /* Start node might have a special color??? Not sure yet. */
-div[data-id="1"] {
+.start {
     box-shadow: 0 0 11px 2px #5464dc;
-    background-color: var(--start-node-color);
+}
+
+.destination {
+    box-shadow: 0 0 11px 2px #f54141;
 }
 
 .react-flow__node {
@@ -50,6 +53,10 @@ div[data-id="1"] {
 }
 
 div.move {
+    visibility: hidden;
+}
+
+.start-select, .destination-select, .add {
     visibility: hidden;
 }
 

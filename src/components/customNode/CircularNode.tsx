@@ -1,16 +1,19 @@
 import {
-    Handle,
-    Position,
-    useConnection,
-    Node,
-    NodeProps,
+	Handle,
+	Position,
+	useConnection,
+	Node,
+	NodeProps,
 } from '@xyflow/react';
+
+import { Mode, Terminal } from '../../utils/enums';
 
 import './CircularNode.css';
 
 type CircularNodeData = {
-    label: string,
-    mode: string,
+	label: string,
+	mode: Mode,
+	terminal: Terminal,
 };
 type CircularNode = Node<CircularNodeData, 'circularNode'>;
 
@@ -21,11 +24,18 @@ function CircularNode({ id, data }: NodeProps<CircularNode>) {
 	const isTarget = connection.inProgress && connection.fromNode.id !== id;
 
 	return (
-		<div className="custom-node-body">
+		<div className={`
+			custom-node-body
+			${data.terminal === Terminal.Start ? 'start' : ''}
+			${data.terminal === Terminal.Destination ? 'destination' : ''}
+		`}>
 			{/* All handles are rendered initially. */}
 			{!connection.inProgress && (
 				<Handle
-					className={`custom-handle ${data.mode}`}
+					className={`
+						custom-handle
+						${data.mode}
+					`}
 					position={Position.Right}
 					type="source"
 				/>
