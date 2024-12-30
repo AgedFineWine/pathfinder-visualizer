@@ -19,7 +19,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import CircularNode from './components/customNode/CircularNode.tsx';
-import CustomPanel from './components/Panel/Panel.tsx';
+import LeftPanel from './components/leftPanel/leftPanel.tsx';
 import ArrowEdge from './components/ArrowEdge.tsx';
 
 import './App.css';
@@ -68,13 +68,9 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 	}
 };
 
-// id: 1 is reserved for the first node. So, we start from 2.
-
 function Flow() {
-	// This function is used to enable click and drag components.
-	// changes variable is an array of nodes
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-	// onEdgesChange is used to remove an edge from two nodes.
+
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
 	const [currentMode, setMode] = useState(defaultMode);
@@ -164,7 +160,7 @@ function Flow() {
             defaultEdgeOptions={defaultEdgeOptions}
 			fitView
 		>
-			<CustomPanel position="top-left"createNode={createNode}	toggleModes={toggleModes} />
+			<LeftPanel position="top-left" createNode={createNode} toggleModes={toggleModes} defaultMode={defaultMode}/>
 			<Background />
 			<Controls />
 		</ReactFlow>
