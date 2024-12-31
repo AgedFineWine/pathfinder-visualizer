@@ -82,7 +82,7 @@ function Flow() {
 		if (currentMode === Mode.StartSelect || currentMode === Mode.DestinationSelect) return;
 		setEdges((oldEdges) => applyEdgeChanges(changes, oldEdges));
 	}, [setEdges, currentMode]);
-	
+
 	const [id, setId] = useState(1);
 
 	const reactFlowInstance = useReactFlow();
@@ -92,18 +92,14 @@ function Flow() {
 	 */
 	const getId = useCallback(() => {
 		let newId: number = id;
-		setId((currentId) => {
-			newId = currentId;
-			for (let i = 1; i < nodes.length + 2; i++) {
-				if (nodes.some((node) => node.id === `${i}`)) {
-					continue;
-				} else {
-					newId = i;
-					break;
-				}
+		for (let i = 1; i < nodes.length + 2; i++) {
+			if (nodes.some((node) => node.id === `${i}`)) {
+				continue;
+			} else {
+				newId = i;
+				break;
 			}
-			return newId;
-		});
+		}
 
 		return `${newId}`;
 	}, [nodes, id]);
@@ -143,6 +139,7 @@ function Flow() {
 		const { x, y } = reactFlowInstance.screenToFlowPosition({ x: event.clientX, y: event.clientY });
 		setNodes((currentNodes) => {
 			const newId = getId();
+			setId((oldId) => Math.max(oldId, parseInt(newId)));
 			const newNode = {
 				id: newId,
 				type: defaultNodeType,
@@ -192,7 +189,7 @@ function Flow() {
 
 	}, [currentMode, setNodes]);
 
-	const handleClick = useCallback((event: React.MouseEvent) => {
+	const spawnNode = useCallback((event: React.MouseEvent) => {
 		if (currentMode !== Mode.Add) return;
 
 		const panel = ((document.getElementsByClassName('react-flow__panel'))[0]);
@@ -216,7 +213,7 @@ function Flow() {
 			nodeTypes={nodeTypes}
 			edgeTypes={edgeTypes}
 			defaultEdgeOptions={defaultEdgeOptions}
-			onClick={handleClick}
+			onClick={spawnNode}
 			onNodeClick={selectNode}
 			fitView
 		>
