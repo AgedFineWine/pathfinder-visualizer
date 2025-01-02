@@ -10,3 +10,8 @@ export enum Terminal {
     Start = 'start',
     Destination = 'destination',
 }
+
+export enum GraphType {
+	Weighted = 'weighted',
+	Unweighted = 'unweighted',
+}
