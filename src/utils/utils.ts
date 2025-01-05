@@ -1,4 +1,4 @@
-import { Position, MarkerType, InternalNode } from '@xyflow/react';
+import { InternalNode } from '@xyflow/react';
 
 interface IntersectionCalculation {
 	base: number,
@@ -111,78 +111,16 @@ function decideScenario(intersectionCalculation: IntersectionCalculation) {
 	};
 }
 
-interface IntersectionPoint {
-	x: number,
-	y: number,
-};
-
-// returns the position (top,right,bottom or right) passed node compared to the intersection point
-function getEdgePosition(node: InternalNode, intersectionPoint: IntersectionPoint) {
-	const n = { ...node.internals.positionAbsolute, ...node };
-	const nx = Math.round(n.x);
-	const ny = Math.round(n.y);
-	const px = Math.round(intersectionPoint.x);
-	const py = Math.round(intersectionPoint.y);
-
-	if (px <= nx + 1) {
-		return Position.Left;
-	}
-	if (px >= nx + n.measured.width! - 1) {
-		return Position.Right;
-	}
-	if (py <= ny + 1) {
-		return Position.Top;
-	}
-	if (py >= n.y + n.measured.height! - 1) {
-		return Position.Bottom;
-	}
-
-	return Position.Top;
-}
 
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
 export function getEdgeParams(source: InternalNode, target: InternalNode) {
 	const intersectionCalculation = getIntersectionInfo(source, target);
 	const { sourceIntersectionPoint, targetIntersectionPoint } = decideScenario(intersectionCalculation);
 
-	const sourcePos = getEdgePosition(source, sourceIntersectionPoint);
-	const targetPos = getEdgePosition(target, targetIntersectionPoint);
-
 	return {
 		sx: sourceIntersectionPoint.x,
 		sy: sourceIntersectionPoint.y,
 		tx: targetIntersectionPoint.x,
 		ty: targetIntersectionPoint.y,
-		sourcePos,
-		targetPos,
 	};
-}
-
-export function createNodesAndEdges() {
-	const nodes = [];
-	const edges = [];
-	const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-
-	nodes.push({ id: 'target', data: { label: 'Target' }, position: center });
-
-	for (let i = 0; i < 8; i++) {
-		const degrees = i * (360 / 8);
-		const radians = degrees * (Math.PI / 180);
-		const x = 250 * Math.cos(radians) + center.x;
-		const y = 250 * Math.sin(radians) + center.y;
-
-		nodes.push({ id: `${i}`, data: { label: 'Source' }, position: { x, y } });
-
-		edges.push({
-			id: `edge-${i}`,
-			target: 'target',
-			source: `${i}`,
-			type: 'floating',
-			markerEnd: {
-				type: MarkerType.Arrow,
-			},
-		});
-	}
-
-	return { nodes, edges };
 }
