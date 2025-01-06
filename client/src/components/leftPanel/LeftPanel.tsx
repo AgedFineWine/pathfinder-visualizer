@@ -4,7 +4,7 @@ import {
     type PanelPosition,
 } from '@xyflow/react';
 
-import { Mode } from '../../utils/enums';
+import { Mode, EdgeType } from '../../utils/enums';
 
 import styles from './leftPanel.module.css';
 
@@ -20,15 +20,16 @@ type LeftPanelProps = {
     position: PanelPosition,
     defaultMode: string,
     toggleModes: (newMode: Mode) => void,
+    toggleEdgeType: (newEdgeType: EdgeType) => void,
 };
 
-function LeftPanel({ position, toggleModes, defaultMode }: LeftPanelProps) {
-    const [active, setActiveGraph] = useState('unweighted');
+function LeftPanel({ position, toggleModes, defaultMode, toggleEdgeType }: LeftPanelProps) {
+    const [active, setActiveEdge] = useState('unweighted');
 
     const [activeMode, setActiveMode] = useState(defaultMode);
 
-    const handleActiveGraph = (btnName: string) => {
-        setActiveGraph(btnName);
+    const handleActiveEdge = (btnName: string) => {
+        setActiveEdge(btnName);
     };
 
     const handleActiveMode = (mode: string) => {
@@ -39,7 +40,7 @@ function LeftPanel({ position, toggleModes, defaultMode }: LeftPanelProps) {
         <Panel position={position}>
             <div className={styles['left-tool-bar']}>
                 <section>
-                    <span>Prebuilt Graphs</span>
+                    <span>Preset Graphs</span>
                     <div className={`${styles['preload-container']}`}>
                         <button className={`${styles['preload-btn']}`}>1</button>
                         <button className={`${styles['preload-btn']}`}>2</button>
@@ -48,14 +49,14 @@ function LeftPanel({ position, toggleModes, defaultMode }: LeftPanelProps) {
                 </section>
 
                 <section className="graph-section">
-                    <span>Graph Type</span>
+                    <span>Edge Type</span>
                     <div className={styles['weighted-btn-container']}>
                         <button
                             className={`
                             ${styles['weight-btn']}
                             ${active === 'weighted' ? `${styles['active-color']}` : ''}
                             `}
-                            onClick={() => handleActiveGraph('weighted')}
+                            onClick={() => handleActiveEdge('weighted')}
                         >
                             Weighted Graph
                         </button>
@@ -66,7 +67,7 @@ function LeftPanel({ position, toggleModes, defaultMode }: LeftPanelProps) {
                             ${styles['weight-btn']}
                             ${active === 'unweighted' ? `${styles['active-color']}` : ''}
                             `}
-                            onClick={() => handleActiveGraph('unweighted')}
+                            onClick={() => handleActiveEdge('unweighted')}
                         >
                             Unweighted Graph
                         </button>
@@ -74,7 +75,7 @@ function LeftPanel({ position, toggleModes, defaultMode }: LeftPanelProps) {
                 </section>
 
                 <section>
-                    <span>Modes</span>
+                    <span>Edit Modes</span>
                     <div className={`${styles['mode-selection']}`}>
                         <div>
                             <button className={`
@@ -120,7 +121,7 @@ function LeftPanel({ position, toggleModes, defaultMode }: LeftPanelProps) {
                 </section>
 
                 <section>
-                    <span>Node Selectors</span>
+                    <span>Start & End Nodes</span>
                     <div className={`${styles['insertion-selection']}`}>
                         <div>
                             <button className={`
@@ -148,14 +149,14 @@ function LeftPanel({ position, toggleModes, defaultMode }: LeftPanelProps) {
                 </section>
 
                 <section>
-                    <span>Algorithms</span>
+                    <span>Traversal Algorithm</span>
                     <form action="" className={`${styles['algorithm-form']}`}>
                         <select name="Selected algorithm" id="select-algorithm" className={`${styles['algorithm-selection']}`} required>
                             <option value="DFS">Depth-first search</option>
                             <option value="BFS">Breadth-first search</option>
                             <option value="A*">A* search</option>
                         </select>
-                        <button type="submit" className={`${styles['submit-btn']}`}>Solve</button>
+                        <button type="submit" className={`${styles['submit-btn']}`}>Run</button>
                     </form>
                 </section>
             </div>
