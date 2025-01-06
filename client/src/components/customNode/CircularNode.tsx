@@ -8,7 +8,7 @@ import {
 
 import { Mode, Terminal } from '../../utils/enums';
 
-import './CircularNode.css';
+import styles from './CircularNode.module.css';
 
 type CircularNodeData = {
 	label: string,
@@ -24,17 +24,19 @@ function CircularNode({ id, data }: NodeProps<CircularNode>) {
 	const isTarget = connection.inProgress && connection.fromNode.id !== id;
 
 	return (
-		<div className={`
-			custom-node-body
-			${data.terminal === Terminal.Start ? 'start' : ''}
-			${data.terminal === Terminal.Destination ? 'destination' : ''}
-		`}>
+		<div
+			className={`
+				${styles['custom-node-body']}
+				${data.terminal === Terminal.Start ? styles.start : ''}
+				${data.terminal === Terminal.Destination ? styles.destination : ''}
+			`}
+		>
 			{/* All handles are rendered initially. */}
 			{!connection.inProgress && (
 				<Handle
 					className={`
-						custom-handle
-						${data.mode}
+						${styles['custom-handle']}
+						${styles[data.mode]}
 					`}
 					position={Position.Right}
 					type="source"
@@ -43,7 +45,10 @@ function CircularNode({ id, data }: NodeProps<CircularNode>) {
 			{/* We want to disable the target handle, if the connection was started from this node */}
 			{(!connection.inProgress || isTarget) && (
 				<Handle
-					className={`custom-handle ${data.mode}`}
+					className={`
+						${styles['custom-handle']}
+						${styles[data.mode]}
+					`}
 					position={Position.Left}
 					type="target"
 					isConnectableStart={false}

@@ -1,1 +1,14 @@
 /** App.css */
+:root {
+    --start-node-color: #8cca59;
+}
+
+.react-flow__node {
+    background-color: var(--start-node-color);
+    border-radius: 50%;
+    width: 100px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
