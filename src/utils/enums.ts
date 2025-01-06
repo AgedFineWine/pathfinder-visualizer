@@ -11,7 +11,7 @@ export enum Terminal {
     Destination = 'destination',
 }
 
-export enum GraphType {
+export enum EdgeType {
 	Weighted = 'weighted',
 	Unweighted = 'unweighted',
 }
