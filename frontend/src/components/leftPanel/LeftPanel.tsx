@@ -18,21 +18,20 @@ import goal from '../../assets/goal.svg';
 // This is just a wrapper.
 type LeftPanelProps = {
     position: PanelPosition,
-    defaultMode: string,
+    defaultMode: Mode,
+    defaultEdgeType: EdgeType,
     toggleModes: (newMode: Mode) => void,
     toggleEdgeType: (newEdgeType: EdgeType) => void,
 };
 
-function LeftPanel({ position, toggleModes, defaultMode, toggleEdgeType }: LeftPanelProps) {
-    const [active, setActiveEdge] = useState('unweighted');
+function LeftPanel({ position, toggleModes, defaultMode, defaultEdgeType, toggleEdgeType }: LeftPanelProps) {
+    const [activeEdgeType, setActiveEdgeType] = useState<EdgeType>(defaultEdgeType);
+    const [activeMode, setActiveMode] = useState<Mode>(defaultMode);
 
-    const [activeMode, setActiveMode] = useState(defaultMode);
-
-    const handleActiveEdge = (btnName: string) => {
-        setActiveEdge(btnName);
+    const handleActiveEdgeType = (btnName: EdgeType) => {
+        setActiveEdgeType(btnName);
     };
-
-    const handleActiveMode = (mode: string) => {
+    const handleActiveMode = (mode: Mode) => {
         setActiveMode(mode);
     };
 
@@ -54,9 +53,12 @@ function LeftPanel({ position, toggleModes, defaultMode, toggleEdgeType }: LeftP
                         <button
                             className={`
                             ${styles['weight-btn']}
-                            ${active === 'weighted' ? `${styles['active-color']}` : ''}
+                            ${activeEdgeType === EdgeType.Weighted ? `${styles['active-color']}` : ''}
                             `}
-                            onClick={() => handleActiveEdge('weighted')}
+                            onClick={() => {
+                                handleActiveEdgeType(EdgeType.Weighted)
+                                toggleEdgeType(EdgeType.Weighted)
+                            }}
                         >
                             Weighted Graph
                         </button>
@@ -65,9 +67,12 @@ function LeftPanel({ position, toggleModes, defaultMode, toggleEdgeType }: LeftP
                         <button
                             className={`
                             ${styles['weight-btn']}
-                            ${active === 'unweighted' ? `${styles['active-color']}` : ''}
+                            ${activeEdgeType === EdgeType.Unweighted ? `${styles['active-color']}` : ''}
                             `}
-                            onClick={() => handleActiveEdge('unweighted')}
+                            onClick={() => {
+                                toggleEdgeType(EdgeType.Unweighted)
+                                handleActiveEdgeType(EdgeType.Unweighted)}
+                            }
                         >
                             Unweighted Graph
                         </button>

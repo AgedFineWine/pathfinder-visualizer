@@ -29,8 +29,8 @@ import WeightedEdge from './components/WeightedEdge.tsx';
 
 import './App.css';
 
-const defaultMode = Mode.Move;
-const defaultEdgeType = EdgeType.Unweighted;
+const defaultMode: Mode = Mode.Move;
+const defaultEdgeType: EdgeType = EdgeType.Weighted;
 const defaultNodeType: string = 'circularNode';
 const radius: number = 50;
 
@@ -69,10 +69,13 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 };
 
 function Flow() {
+	/**
+	 * setMode() is used to set the current mode of the application. The mode determines what the user can do.
+	 * Check the Mode enum for more information.
+	*/
 	const [currentMode, setMode] = useState<Mode>(defaultMode);
+	const [nodes, setNodes] = useState<Node[]>(initialNodes);
 
-
-	const [nodes, setNodes] = useState(initialNodes);
 	/**
 	 * onNodesChange() is used to update the nodes on the pane. It is called whenever the nodes change.
 	 * Like when nodes move.
@@ -173,6 +176,7 @@ function Flow() {
 
 
 	const reactFlowInstance = useReactFlow();
+
 	/**
 	 * createNode() is used to create a new node on the pane.
 	 * 
@@ -183,6 +187,8 @@ function Flow() {
 		const { x, y } = reactFlowInstance.screenToFlowPosition({ x: event.clientX, y: event.clientY });
 		setNodes((currentNodes) => {
 			const newId = getId();
+			// NOTE: Update the ID of the node after it is created. New IDs are guaranteed to be greater than the
+			// current existing IDs.
 			setId((oldId) => Math.max(oldId, parseInt(newId)));
 			const newNode = {
 				id: newId,
@@ -207,7 +213,7 @@ function Flow() {
 	 * @param node The node on the pane that was selected.
 	 */
 	const selectNode = useCallback((_event: React.MouseEvent, node: Node) => {
-		// Convert Mode to Terminal enum.
+		// NOTE: Convert Mode to Terminal enum.
 		const terminal = currentMode === Mode.StartSelect ? Terminal.Start :
 			(currentMode === Mode.DestinationSelect ? Terminal.Destination
 				: null);
@@ -216,6 +222,7 @@ function Flow() {
 
 		setNodes((currentNodes) => {
 			return currentNodes.map((n) => {
+				// NOTE: Reset all nodes that have terminals.
 				if (n.data.terminal === terminal) {
 					return {
 						...n,
@@ -225,6 +232,7 @@ function Flow() {
 						}
 					};
 				}
+				// NOTE: Set the terminal of the selected node.
 				if (n.id === node.id) {
 					return {
 						...n,
@@ -254,14 +262,14 @@ function Flow() {
 	}, [currentMode, createNode]);
 
 
-	const [, setEdgeType] = useState<EdgeType>(defaultEdgeType);
+	const edgeTypeRef = useRef<EdgeType>(defaultEdgeType);
 	/**
 	 * toggleEdgeType() is used to toggle the edge type between weighted and unweighted.
 	 * 
 	 * @param newEdgeType The new edge type to set.
 	 */
 	const toggleEdgeType = useCallback((newEdgeType: EdgeType) => {
-		setEdgeType(newEdgeType);
+		edgeTypeRef.current = newEdgeType;
 
 		setNodes((currentNodes) => {
 			return currentNodes.map((node) => {
@@ -269,6 +277,7 @@ function Flow() {
 					...node,
 					data: {
 						...node.data,
+						edgeType: newEdgeType,
 					}
 				};
 				return modifiedNode;
@@ -291,8 +300,15 @@ function Flow() {
 			onPaneClick={spawnNode}
 			onNodeClick={selectNode}
 			fitView
+			fitViewOptions={{ minZoom: 0.8, maxZoom: 0.9 }}
 		>
-			<LeftPanel position="top-left" toggleModes={toggleModes} defaultMode={defaultMode} toggleEdgeType={toggleEdgeType} />
+			<LeftPanel
+				position="top-left"
+				toggleModes={toggleModes}
+				defaultMode={defaultMode}
+				defaultEdgeType={defaultEdgeType}
+				toggleEdgeType={toggleEdgeType}
+			/>
 			<Background />
 			<Controls />
 		</ReactFlow>

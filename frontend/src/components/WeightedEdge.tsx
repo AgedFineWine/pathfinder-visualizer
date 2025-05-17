@@ -38,6 +38,7 @@ function WeightedEdge({ id, source, target, markerEnd, style }: EdgeProps) {
                         width: '3ch',
                         borderStyle: 'solid',
                         borderRadius: '3px',
+                        // display: 'none',
                     }}
                     type="text"
                     required

@@ -4,14 +4,14 @@ export enum Mode {
 	Add = 'add',
 	StartSelect = 'start-select',
 	DestinationSelect = 'destination-select',
-}
+};
 
 export enum Terminal {
     Start = 'start',
     Destination = 'destination',
-}
+};
 
 export enum EdgeType {
 	Weighted = 'weighted',
 	Unweighted = 'unweighted',
-}
+};
