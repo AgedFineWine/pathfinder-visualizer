@@ -71,9 +71,14 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 function Flow() {
 	/**
 	 * setMode() is used to set the current mode of the application. The mode determines what the user can do.
-	 * Check the Mode enum for more information.
+	 * There are currently only 5 types of Modes: move, add, select, select start end, select end node.
 	*/
 	const [currentMode, setMode] = useState<Mode>(defaultMode);
+
+	/**
+	 * This is the state of the nodes on the pane. It is used to store the nodes that are currently on the pane.
+	 * We pass initialNodes to the state and the user gradually makes changes to these nodes like adding or removing them.
+	 */
 	const [nodes, setNodes] = useState<Node[]>(initialNodes);
 
 	/**
@@ -88,8 +93,12 @@ function Flow() {
 		setNodes((oldNodes) => applyNodeChanges(changes, oldNodes));
 	}, [setNodes, currentMode]);
 
-
+	/**
+	 * This is the state of the edges on the pane. It is used to store the edges that are currently on the pane.
+	 * We pass initialEdges to the state and the user gradually makes changes to these edges like adding or removing them.
+	 */
 	const [edges, setEdges] = useState(initialEdges);
+
 	/**
 	 * onEdgesChange() is used to update the edges on the pane. It is called whenever the edges change.
 	 * Like when edges are added or removed.
@@ -121,7 +130,6 @@ function Flow() {
 		return `${newId}`;
 	}, [nodes, id]);
 
-
 	/**
 	 * onConnect() is used to connect two nodes. This is what the user sees before releasing their mouse.
 	 * Once the user releases their mouse, the connection is finalized and added to the list of edges.
@@ -138,7 +146,6 @@ function Flow() {
 		});
 	}, [setEdges]);
 
-
 	// NOTE: Empty string '' represents the grab cursor.
 	const cursorStyleRef = useRef<'crosshair' | ''>('');
 	useEffect(() => {
@@ -149,6 +156,7 @@ function Flow() {
 		}
 
 	}, [currentMode]);
+
 	/**
 	 * toggleModes() is used to toggle between the different modes of the application.
 	 * 
@@ -263,6 +271,7 @@ function Flow() {
 
 
 	const edgeTypeRef = useRef<EdgeType>(defaultEdgeType);
+
 	/**
 	 * toggleEdgeType() is used to toggle the edge type between weighted and unweighted.
 	 * 
