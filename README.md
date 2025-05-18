@@ -23,7 +23,6 @@ Currently still in progress:
 
 ## Todo (Frontend)
 
-- Implement unweighted graph edges.
 - Make the toolbox more responsive for a smoother user experience.
 - Potential bug fixes
 - [For later] Reconsider UI choice for start/end node selection to improve usability.
