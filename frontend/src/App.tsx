@@ -21,11 +21,11 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { Mode, Terminal, EdgeType } from './utils/enums.ts';
+import { Mode, Terminal, EdgeType } from './constants/enums.ts';
 
-import CircularNode from './components/customNode/CircularNode.tsx';
-import LeftPanel from './components/leftPanel/LeftPanel.tsx';
-import CustomEdge from './components/CustomEdge.tsx';
+import CircularNode from './components/nodes/CircularNode.tsx';
+import LeftPanel from './components/panels/LeftPanel.tsx';
+import CustomEdge from './components/edges/CustomEdge.tsx';
 
 import './App.css';
 

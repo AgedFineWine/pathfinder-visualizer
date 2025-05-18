@@ -6,7 +6,7 @@ import {
 	NodeProps,
 } from '@xyflow/react';
 
-import { Mode, Terminal } from '../../utils/enums';
+import { Mode, Terminal } from '../../constants/enums';
 
 import styles from './CircularNode.module.css';
 

@@ -4,7 +4,7 @@ import {
     type PanelPosition,
 } from '@xyflow/react';
 
-import { Mode, EdgeType } from '../../utils/enums';
+import { Mode, EdgeType } from '../../constants/enums';
 
 import styles from './leftPanel.module.css';
 

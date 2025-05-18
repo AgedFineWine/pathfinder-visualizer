@@ -6,8 +6,8 @@ import {
     EdgeLabelRenderer,
 } from '@xyflow/react';
 
-import { getEdgeParams } from '../utils/utils.ts';
-import { EdgeType } from '../utils/enums.ts';
+import { getEdgeParams } from '../../utils/graphMath.ts';
+import { EdgeType } from '../../constants/enums.ts';
 
 
 function CustomEdge({ id, source, target, markerEnd, style, data }: EdgeProps) {
