@@ -25,7 +25,7 @@ import { Mode, Terminal, EdgeType } from './utils/enums.ts';
 
 import CircularNode from './components/customNode/CircularNode.tsx';
 import LeftPanel from './components/leftPanel/LeftPanel.tsx';
-import WeightedEdge from './components/WeightedEdge.tsx';
+import CustomEdge from './components/CustomEdge.tsx';
 
 import './App.css';
 
@@ -42,7 +42,6 @@ const initialNodes: Node[] = [
 			label: '1',
 			mode: defaultMode,
 			terminal: Terminal.Start,
-			edgeType: defaultEdgeType,
 		},
 		position: { x: 0, y: 0 },
 	},
@@ -55,11 +54,11 @@ const nodeTypes: NodeTypes = {
 };
 
 const edgeTypes = {
-	weightedEdge: WeightedEdge,
+	customEdge: CustomEdge,
 };
 
 const defaultEdgeOptions: DefaultEdgeOptions = {
-	type: 'weightedEdge',
+	type: 'customEdge',
 	markerEnd: {
 		type: MarkerType.ArrowClosed,
 	},
@@ -111,8 +110,8 @@ function Flow() {
 		setEdges((oldEdges) => applyEdgeChanges(changes, oldEdges));
 	}, [setEdges, currentMode]);
 
-
 	const [id, setId] = useState(1);
+
 	/**
 	 * getId() generates a new ID that is guaranteed that it is not already in use.
 	 * This is necessary because the user can delete nodes and the ID of the node is not reused.
@@ -140,6 +139,10 @@ function Flow() {
 		const newEdge: Edge = {
 			...connection,
 			id: `${connection.source}-${connection.target}`,
+			type: 'customEdge',
+			data: {
+				edgeType: edgeTypeRef.current,
+			}
 		};
 		setEdges((oldEdges) => {
 			return addEdge(newEdge, oldEdges)
@@ -148,6 +151,7 @@ function Flow() {
 
 	// NOTE: Empty string '' represents the grab cursor.
 	const cursorStyleRef = useRef<'crosshair' | ''>('');
+
 	useEffect(() => {
 		const pane = document.getElementsByClassName('react-flow__pane')[0] as HTMLElement;
 
@@ -182,7 +186,6 @@ function Flow() {
 		setMode(newMode);
 	}, [setNodes]);
 
-
 	const reactFlowInstance = useReactFlow();
 
 	/**
@@ -211,7 +214,6 @@ function Flow() {
 			return [...currentNodes, newNode];
 		});
 	}, [currentMode, setNodes, getId, reactFlowInstance]);
-
 
 	/**
 	 * selectNode() is used to select a node as a start or destination node. It is part of the 
@@ -256,7 +258,6 @@ function Flow() {
 
 	}, [currentMode, setNodes]);
 
-
 	/**
 	 * spawnNode() is used to spawn a new node when the user clicks on the pane.
 	 * 
@@ -265,31 +266,32 @@ function Flow() {
 	 */
 	const spawnNode = useCallback((event: React.MouseEvent) => {
 		if (currentMode !== Mode.Add) return;
-
 		createNode(event);
 	}, [currentMode, createNode]);
 
-
+	/**
+	 * edgeTypeRef is used to store the current edge type.
+	 * It is used to determine whether the edge is weighted or unweighted.
+	 */
 	const edgeTypeRef = useRef<EdgeType>(defaultEdgeType);
 
 	/**
 	 * toggleEdgeType() is used to toggle the edge type between weighted and unweighted.
 	 * 
-	 * @param newEdgeType The new edge type to set.
+	 * @param newEdgeType The new edge type to set (either unweighted or weighted).
 	 */
 	const toggleEdgeType = useCallback((newEdgeType: EdgeType) => {
 		edgeTypeRef.current = newEdgeType;
 
-		setNodes((currentNodes) => {
-			return currentNodes.map((node) => {
-				const modifiedNode: Node = {
-					...node,
+		setEdges((currentEdges) => {
+			return currentEdges.map((edge) => {
+				const modifiedEdge: Edge = {
+					...edge,
 					data: {
-						...node.data,
 						edgeType: newEdgeType,
 					}
-				};
-				return modifiedNode;
+				}
+				return modifiedEdge;
 			});
 		});
 	}, []);
