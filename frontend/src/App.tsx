@@ -8,64 +8,26 @@ import {
 	addEdge,
 	ReactFlowProvider,
 	ConnectionLineType,
-	MarkerType,
-	DefaultEdgeOptions,
 	useReactFlow,
 	NodeChange,
 	EdgeChange,
 	type Node,
 	type Edge,
-	type NodeTypes,
 	type OnConnect,
-	type Connection,
+	type Connection
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { Mode, Terminal, EdgeType } from './constants/enums.ts';
 
-import CircularNode from './components/nodes/CircularNode.tsx';
+import { defaultNodeType, defaultMode, defaultEdgeType, radius } from './constants/defaults.ts';
+import { defaultEdgeOptions } from './constants/edgeOptions.ts';
+import { nodeTypes, edgeTypes } from './constants/flowTypes.ts';
+import { initialNodes, initialEdges } from './constants/initialGraph.ts';
+
 import LeftPanel from './components/panels/LeftPanel.tsx';
-import CustomEdge from './components/edges/CustomEdge.tsx';
 
 import './App.css';
-
-const defaultMode: Mode = Mode.Move;
-const defaultEdgeType: EdgeType = EdgeType.Weighted;
-const defaultNodeType: string = 'circularNode';
-const radius: number = 50;
-
-const initialNodes: Node[] = [
-	{
-		id: '1',
-		type: defaultNodeType,
-		data: {
-			label: '1',
-			mode: defaultMode,
-			terminal: Terminal.Start,
-		},
-		position: { x: 0, y: 0 },
-	},
-];
-
-const initialEdges: Edge[] = [];
-
-const nodeTypes: NodeTypes = {
-	circularNode: CircularNode,
-};
-
-const edgeTypes = {
-	customEdge: CustomEdge,
-};
-
-const defaultEdgeOptions: DefaultEdgeOptions = {
-	type: 'customEdge',
-	markerEnd: {
-		type: MarkerType.ArrowClosed,
-	},
-	style: {
-		strokeWidth: 3,
-	}
-};
 
 function Flow() {
 	/**
