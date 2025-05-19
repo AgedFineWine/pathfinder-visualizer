@@ -21,14 +21,18 @@ Currently still in progress:
 ![Larger graph](docs/large-graph.png)
 ![Cool graph](docs/cool.png)
 
-## Todo (Frontend)
-
-- Make the toolbox more responsive for a smoother user experience.
-- Potential bug fixes
+## TODO
+- configure postgresql database
+- set up spring data jpa with connection to supabase
+- work on business logic (service classes) for pathfinding
+- work on backend architecture diagram/planning
+- [For later] Make the toolbox more responsive for a smoother user experience.
 - [For later] Reconsider UI choice for start/end node selection to improve usability.
 - [For later] Explore new ways of adding and managing nodes to simplify interaction.
 
-## Backend (Future)
+## Backend Overview
 
 - **Spring Boot Integration**: The backend will be powered by Spring Boot for the execution of pathfinding algorithms, saving/loading graph structures, and maybe enabling multiplayer graph collaboration. JGraphT will be utilized to run these algorithms
 - **Real-time Algorithm Execution**: The backend will handle the complex computations, such as calculating the shortest path, while the frontend will provide real-time updates and visualizations. This will include pauses, slow-motion etc.
+- Prebuilt graphs will be stored and served using a Postgresql database hosted on supabase
+
