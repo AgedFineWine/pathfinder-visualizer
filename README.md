@@ -21,7 +21,7 @@ Currently still in progress:
 ![Larger graph](docs/large-graph.png)
 ![Cool graph](docs/cool.png)
 
-## TODO
+## Todo
 - configure postgresql database
 - set up spring data jpa with connection to supabase
 - work on business logic (service classes) for pathfinding
