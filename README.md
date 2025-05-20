@@ -32,7 +32,7 @@ Currently still in progress:
 
 ## Backend Overview
 
-- **Spring Boot Integration**: The backend will be powered by Spring Boot for the execution of pathfinding algorithms, saving/loading graph structures, and maybe enabling multiplayer graph collaboration. JGraphT will be utilized to run these algorithms
+- **Spring Boot Integration**: The backend will be powered by Spring Boot for the execution of pathfinding algorithms, loading prebuilt graph structures, and maybe enabling multiplayer graph collaboration (not sure). JGraphT will be utilized to run these algorithms
 - **Real-time Algorithm Execution**: The backend will handle the complex computations, such as calculating the shortest path, while the frontend will provide real-time updates and visualizations. This will include pauses, slow-motion etc.
 - Prebuilt graphs will be stored and served using a Postgresql database hosted on supabase
 
