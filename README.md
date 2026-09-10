@@ -36,3 +36,8 @@ Currently still in progress:
 - **Real-time Algorithm Execution**: The backend will handle the complex computations, such as calculating the shortest path, while the frontend will provide real-time updates and visualizations. This will include pauses, slow-motion etc.
 - Prebuilt graphs will be stored and served using a Postgresql database hosted on supabase
 
+
+## Updates
+10/25/2025: Picked up project, worked on sequence diagrams, component diagram, class diagrams
+
+

@@ -1,0 +1,62 @@
+@startuml Algorithm Execution Flow
+actor User as user
+participant "Frontend" as frontend
+participant "Algorithm Service" as algorithm_service
+participant "Graph Service" as graph_service
+note over graph_service
+Includes:
+- Graph operations
+- Graph validation
+- Graph persistence
+end note
+participant "Database" as db
+
+== Graph Construction Phase ==
+alt Load Prebuilt Graph From Database
+    user -> frontend: Select prebuilt graph
+    frontend -> graph_service: Request prebuilt graph
+    note left: Using REST API
+    graph_service -> db: Query prebuilt graph
+    db --> graph_service: Prebuilt graph data
+    graph_service --> frontend: Prebuilt graph data
+
+else Manually Build Graph
+    user -> frontend: Build graph with nodes and edges
+
+end
+frontend -> frontend: Render graph
+
+== Graph Validation Phase ==
+
+user -> frontend: Run an algorithm
+alt Graph Invalid
+    frontend -> user: Show error message
+
+else Graph Valid
+    frontend -> graph_service: Validate graph
+
+    alt Validation Fail
+        graph_service --> frontend: Error message
+        frontend -> user: Show error message
+
+    else Validation Success
+
+== Algorithm Execution Phase ==
+        graph_service -> algorithm_service: Execute algorithm request
+
+        loop For each algorithm step
+            algorithm_service -> algorithm_service: Run algorithm
+            algorithm_service ->> frontend: Push step data
+            note left: Via WebSocket\nStep data includes:\n- Visited nodes\n- Current node\n - etc
+        end
+    end
+end
+
+== Algorithm Visualization Phase ==
+loop for each step
+    frontend -> frontend: Render step
+    user -> frontend: View next or previous step
+    note right: User can view statistics
+end
+
+@enduml
